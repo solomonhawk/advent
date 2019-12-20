@@ -1,7 +1,7 @@
 defmodule Day1Test do
   use ExUnit.Case
 
-  describe "part 1" do
+  describe "FuelMass Calculator #calculate" do
     test "fuel required for module with mass 12 is 2" do
       assert FuelMass.Calculator.calculate(12) == 2
     end
@@ -17,13 +17,9 @@ defmodule Day1Test do
     test "fuel required for module with mass 100756 is 33583" do
       assert FuelMass.Calculator.calculate(100756) == 33583
     end
-
-    test "run" do
-      assert Day1.Part1.run == 3374289
-    end
   end
 
-  describe "part 2" do
+  describe "FuelMass Calculator #calculate_total" do
     test "total fuel required for module with mass 14 and its fuel is 2" do
       assert FuelMass.Calculator.calculate_total(14) == 2
     end
@@ -35,8 +31,16 @@ defmodule Day1Test do
     test "total fuel required for module with mass 100756 and its fuel is 966" do
       assert FuelMass.Calculator.calculate_total(100756) == 50346
     end
+  end
 
-    test "run" do
+  describe "part 1" do
+    test "calculates the sum of all the fuel requirements for the ship modules" do
+      assert Day1.Part1.run == 3374289
+    end
+  end
+
+  describe "part 2" do
+    test "calculates the sum of all the fuel requirements for the ship modules and their fuel" do
       assert Day1.Part2.run == 5058559
     end
   end
