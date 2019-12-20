@@ -58,12 +58,7 @@ defmodule Day3.Part1 do
   intersection?
   """
   def run do
-    parse()
+    Day3.parse()
     |> Wire.Fixer.uncross()
-  end
-
-  def parse do
-    File.read!(Path.join(__DIR__, "../input.txt"))
-    |> Wire.Parser.parse_wires()
   end
 end
