@@ -44,5 +44,6 @@ defmodule Day3.Part2 do
   """
   def run do
     Day3.parse()
+    |> Wire.Fixer.uncross_min_distance()
   end
 end
