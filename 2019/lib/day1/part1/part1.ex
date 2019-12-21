@@ -37,8 +37,8 @@ defmodule Day1.Part1 do
   def run do
     parse()
     |> Enum.map(&FuelMass.Calculator.calculate/1)
-    |> Enum.sum
-    |> Kernel.trunc
+    |> Enum.sum()
+    |> Kernel.trunc()
   end
 
   def parse do

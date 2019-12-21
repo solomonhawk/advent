@@ -5,7 +5,7 @@ defmodule Intcode.Constants.OpCodes do
   @mult 2
   @halt 99
 
-  define add, @add
-  define mult, @mult
-  define halt, @halt
+  define(add, @add)
+  define(mult, @mult)
+  define(halt, @halt)
 end

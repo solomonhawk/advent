@@ -3,7 +3,7 @@ defmodule Wire.Parser do
     input
     |> String.split("\n", trim: true)
     |> Enum.map(&parse_wire/1)
-    |> List.to_tuple
+    |> List.to_tuple()
   end
 
   def parse_wire(input) do

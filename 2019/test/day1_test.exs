@@ -15,7 +15,7 @@ defmodule Day1Test do
     end
 
     test "fuel required for module with mass 100756 is 33583" do
-      assert FuelMass.Calculator.calculate(100756) == 33583
+      assert FuelMass.Calculator.calculate(100_756) == 33583
     end
   end
 
@@ -29,19 +29,19 @@ defmodule Day1Test do
     end
 
     test "total fuel required for module with mass 100756 and its fuel is 966" do
-      assert FuelMass.Calculator.calculate_total(100756) == 50346
+      assert FuelMass.Calculator.calculate_total(100_756) == 50346
     end
   end
 
   describe "part 1" do
     test "calculates the sum of all the fuel requirements for the ship modules" do
-      assert Day1.Part1.run == 3374289
+      assert Day1.Part1.run() == 3_374_289
     end
   end
 
   describe "part 2" do
     test "calculates the sum of all the fuel requirements for the ship modules and their fuel" do
-      assert Day1.Part2.run == 5058559
+      assert Day1.Part2.run() == 5_058_559
     end
   end
 end

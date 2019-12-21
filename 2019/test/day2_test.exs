@@ -21,7 +21,7 @@ defmodule Day2Test do
 
   describe "part 1" do
     test "the prepared program, after being fixed, yields the correct instruction at position 0" do
-      assert Day2.Part1.run == 6327510
+      assert Day2.Part1.run() == 6_327_510
     end
   end
 
@@ -30,7 +30,7 @@ defmodule Day2Test do
       # the final result is (100 * number1 + number2),
       # where number1 is substituted at position 1
       # and number2 is substituted at position 2
-      assert Day2.Part2.run == 4112
+      assert Day2.Part2.run() == 4112
     end
   end
 end

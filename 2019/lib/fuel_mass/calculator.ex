@@ -16,7 +16,7 @@ defmodule FuelMass.Calculator do
   end
 
   defp total_fuel_required_for_module(mass, acc) when mass <= 0.0 do
-    acc |> Kernel.trunc
+    acc |> Kernel.trunc()
   end
 
   defp total_fuel_required_for_module(mass, acc) do

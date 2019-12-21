@@ -16,21 +16,21 @@ defmodule Intcode.Fixer do
   end
 
   # add
-  def execute_instruction([op, p1, p2, p3], {instr_pointer, memory}) when op == OpCodes.add do
+  def execute_instruction([op, p1, p2, p3], {instr_pointer, memory}) when op == OpCodes.add() do
     memory
     |> List.replace_at(p3, value_at(memory, p1) + value_at(memory, p2))
-    |> fix(instr_pointer + Constants.instruction_len)
+    |> fix(instr_pointer + Constants.instruction_len())
   end
 
   # multiply
-  def execute_instruction([op, p1, p2, p3], {instr_pointer, memory}) when op == OpCodes.mult do
+  def execute_instruction([op, p1, p2, p3], {instr_pointer, memory}) when op == OpCodes.mult() do
     memory
     |> List.replace_at(p3, value_at(memory, p1) * value_at(memory, p2))
-    |> fix(instr_pointer + Constants.instruction_len)
+    |> fix(instr_pointer + Constants.instruction_len())
   end
 
   # halt
-  def execute_instruction([op | _], {_instr_pointer, memory}) when op == OpCodes.halt do
+  def execute_instruction([op | _], {_instr_pointer, memory}) when op == OpCodes.halt() do
     memory
   end
 end

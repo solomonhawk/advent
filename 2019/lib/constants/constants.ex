@@ -46,7 +46,7 @@ defmodule Constants do
   @doc "Define a constant. An alias for constant"
   defmacro define(name, value) do
     quote do
-      constant unquote(name), unquote(value)
+      constant(unquote(name), unquote(value))
     end
   end
 end

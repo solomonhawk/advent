@@ -10,7 +10,7 @@ defmodule Intcode do
   def instruction_at(memory, instr_pointer) do
     memory
     |> Enum.drop(instr_pointer)
-    |> Enum.take(Constants.instruction_len)
+    |> Enum.take(Constants.instruction_len())
   end
 
   def value_at(memory, instr_pointer) do

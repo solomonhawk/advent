@@ -51,20 +51,22 @@ defmodule Day2.Part2 do
     input = parse()
 
     # try all combinations of pairs of numbers within the valid input range
-    {i1, i2} = Enum.reduce(0..99, {0, 0}, fn x, acc ->
-      Enum.reduce(0..99, acc, fn y, acc ->
-        result = input
-        |> List.replace_at(1, x)
-        |> List.replace_at(2, y)
-        |> Intcode.Fixer.fix()
-        |> hd()
+    {i1, i2} =
+      Enum.reduce(0..99, {0, 0}, fn x, acc ->
+        Enum.reduce(0..99, acc, fn y, acc ->
+          result =
+            input
+            |> List.replace_at(1, x)
+            |> List.replace_at(2, y)
+            |> Intcode.Fixer.fix()
+            |> hd()
 
-        case result do
-          19690720 -> {x, y}
-          _        -> acc
-        end
+          case result do
+            19_690_720 -> {x, y}
+            _ -> acc
+          end
+        end)
       end)
-    end)
 
     100 * i1 + i2
   end
