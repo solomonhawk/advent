@@ -8,20 +8,12 @@ defmodule Wire.Fixer do
   end
 
   def uncross_min_distance({wire1, wire2}) do
-    # calculate the locations visited and distance at each step
-    w1 = to_distance_map(wire1)
-    w2 = to_distance_map(wire2)
+    m1 = to_map(wire1)
+    m2 = to_map(wire2)
 
-    m1 = MapSet.new(Map.keys(w1))
-    m2 = MapSet.new(Map.keys(w2))
-
-    # find the intersections
-    MapSet.intersection(m1, m2)
-    |> Enum.map(fn point ->
-      # for each intersection, sum the distances for each wire
-      Map.get(w1, point) + Map.get(w2, point)
-    end)
-    # find the lowest distance
+    MapSet.new(Map.keys(m1))
+    |> MapSet.intersection(MapSet.new(Map.keys(m2)))
+    |> Enum.map(&(Map.get(m1, &1) + Map.get(m2, &1)))
     |> Enum.sort()
     |> List.first()
   end
@@ -31,66 +23,54 @@ defmodule Wire.Fixer do
   end
 
   def to_set(wire) do
-    to_set(wire, MapSet.new(), {0, 0})
+    to_set(MapSet.new(), wire, {0, 0})
   end
 
-  def to_set([{:right, n} | rest], set, {sx, y}) do
-    new_set = for x <- (sx + 1)..(sx + n), into: set, do: {x, y}
-
-    to_set(rest, new_set, {sx + n, y})
+  def to_set(set, [{:right, n} | rest], {sx, y}) do
+    for(x <- (sx + 1)..(sx + n), into: set, do: {x, y}) |> to_set(rest, {sx + n, y})
   end
 
-  def to_set([{:left, n} | rest], set, {sx, y}) do
-    new_set = for x <- (sx - 1)..(sx - n), into: set, do: {x, y}
-
-    to_set(rest, new_set, {sx - n, y})
+  def to_set(set, [{:left, n} | rest], {sx, y}) do
+    for(x <- (sx - 1)..(sx - n), into: set, do: {x, y}) |> to_set(rest, {sx - n, y})
   end
 
-  def to_set([{:up, n} | rest], set, {x, sy}) do
-    new_set = for y <- (sy + 1)..(sy + n), into: set, do: {x, y}
-
-    to_set(rest, new_set, {x, sy + n})
+  def to_set(set, [{:up, n} | rest], {x, sy}) do
+    for(y <- (sy + 1)..(sy + n), into: set, do: {x, y}) |> to_set(rest, {x, sy + n})
   end
 
-  def to_set([{:down, n} | rest], set, {x, sy}) do
-    new_set = for y <- (sy - 1)..(sy - n), into: set, do: {x, y}
-
-    to_set(rest, new_set, {x, sy - n})
+  def to_set(set, [{:down, n} | rest], {x, sy}) do
+    for(y <- (sy - 1)..(sy - n), into: set, do: {x, y}) |> to_set(rest, {x, sy - n})
   end
 
-  def to_set([], set, _) do
+  def to_set(set, [], _) do
     set
   end
 
-  def to_distance_map(wire) do
-    to_distance_map(wire, Map.new(), {0, 0}, 0)
+  def to_map(wire) do
+    to_map(Map.new(), wire, {0, 0}, 0)
   end
 
-  def to_distance_map([{:right, n} | rest], map, {sx, y}, d) do
-    new_map = for x <- (sx + 1)..(sx + n), into: map, do: {{x, y}, d + (x - sx)}
-
-    to_distance_map(rest, new_map, {sx + n, y}, d + n)
+  def to_map(map, [{:right, n} | rest], {sx, y}, d) do
+    for(x <- (sx + 1)..(sx + n), into: map, do: {{x, y}, d + (x - sx)})
+    |> to_map(rest, {sx + n, y}, d + n)
   end
 
-  def to_distance_map([{:left, n} | rest], map, {sx, y}, d) do
-    new_map = for x <- (sx - 1)..(sx - n), into: map, do: {{x, y}, d - (x - sx)}
-
-    to_distance_map(rest, new_map, {sx - n, y}, d + n)
+  def to_map(map, [{:left, n} | rest], {sx, y}, d) do
+    for(x <- (sx - 1)..(sx - n), into: map, do: {{x, y}, d - (x - sx)})
+    |> to_map(rest, {sx - n, y}, d + n)
   end
 
-  def to_distance_map([{:up, n} | rest], map, {x, sy}, d) do
-    new_map = for y <- (sy + 1)..(sy + n), into: map, do: {{x, y}, d + y - sy}
-
-    to_distance_map(rest, new_map, {x, sy + n}, d + n)
+  def to_map(map, [{:up, n} | rest], {x, sy}, d) do
+    for(y <- (sy + 1)..(sy + n), into: map, do: {{x, y}, d + (y - sy)})
+    |> to_map(rest, {x, sy + n}, d + n)
   end
 
-  def to_distance_map([{:down, n} | rest], map, {x, sy}, d) do
-    new_map = for y <- (sy - 1)..(sy - n), into: map, do: {{x, y}, d - (y - sy)}
-
-    to_distance_map(rest, new_map, {x, sy - n}, d + n)
+  def to_map(map, [{:down, n} | rest], {x, sy}, d) do
+    for(y <- (sy - 1)..(sy - n), into: map, do: {{x, y}, d - (y - sy)})
+    |> to_map(rest, {x, sy - n}, d + n)
   end
 
-  def to_distance_map([], map, _, _) do
+  def to_map(map, [], _, _) do
     map
   end
 end
