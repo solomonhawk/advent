@@ -16,8 +16,8 @@ defmodule Intcode.Instruction do
     }
   end
 
-  def instruction_at(program, instr_pointer) do
-    program = Enum.drop(program, instr_pointer)
+  def instruction_at(program, program_counter) do
+    program = Enum.drop(program, program_counter)
     op = instruction_op(hd(program))
     command = Enum.take(program, instruction_length(op))
 

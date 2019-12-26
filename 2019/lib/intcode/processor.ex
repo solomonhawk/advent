@@ -15,22 +15,22 @@ defmodule Intcode.Processor do
     ExecutionContext.new(program: program) |> fix()
   end
 
-  def fix(%ExecutionContext{program: program, instruction_pointer: instruction_pointer} = context) do
+  def fix(%ExecutionContext{program: program, program_counter: program_counter} = context) do
     program
-    |> instruction_at(instruction_pointer)
+    |> instruction_at(program_counter)
     |> execute_instruction(context)
   end
 
   # add
   def execute_instruction(
         %Instruction{op: op, parameters: [p1, p2, p3]},
-        %ExecutionContext{program: program, instruction_pointer: instruction_pointer} = context
+        %ExecutionContext{program: program, program_counter: program_counter} = context
       )
       when op == OpCodes.add() do
     context
     |> struct(
       program: List.replace_at(program, value_of(p3), deref(program, p1) + deref(program, p2)),
-      instruction_pointer: instruction_pointer + instruction_length(OpCodes.add())
+      program_counter: program_counter + instruction_length(OpCodes.add())
     )
     |> fix()
   end
@@ -38,13 +38,13 @@ defmodule Intcode.Processor do
   # multiply
   def execute_instruction(
         %Instruction{op: op, parameters: [p1, p2, p3]},
-        %ExecutionContext{program: program, instruction_pointer: instruction_pointer} = context
+        %ExecutionContext{program: program, program_counter: program_counter} = context
       )
       when op == OpCodes.mult() do
     context
     |> struct(
       program: List.replace_at(program, value_of(p3), deref(program, p1) * deref(program, p2)),
-      instruction_pointer: instruction_pointer + instruction_length(OpCodes.mult())
+      program_counter: program_counter + instruction_length(OpCodes.mult())
     )
     |> fix()
   end
@@ -59,7 +59,7 @@ defmodule Intcode.Processor do
       p2 = Parameter.new(value: number, mode: Constants.immediate())
 
       execute_instruction(
-        %Instruction{instruction | parameters: [p1, p2]},
+        struct(instruction, parameters: [p1, p2]),
         context
       )
     end
@@ -67,13 +67,13 @@ defmodule Intcode.Processor do
 
   def execute_instruction(
         %Instruction{op: op, parameters: [p1, p2]},
-        %ExecutionContext{program: program, instruction_pointer: instruction_pointer} = context
+        %ExecutionContext{program: program, program_counter: program_counter} = context
       )
       when op == OpCodes.input() do
     context
     |> struct(
       program: List.replace_at(program, value_of(p1), deref(program, p2)),
-      instruction_pointer: instruction_pointer + instruction_length(OpCodes.input())
+      program_counter: program_counter + instruction_length(OpCodes.input())
     )
     |> fix()
   end
@@ -83,7 +83,7 @@ defmodule Intcode.Processor do
         %Instruction{op: op, parameters: [p1]},
         %ExecutionContext{
           program: program,
-          instruction_pointer: instruction_pointer
+          program_counter: program_counter
         } = context
       )
       when op == OpCodes.output() do
@@ -92,7 +92,7 @@ defmodule Intcode.Processor do
     context
     |> struct(
       program: program,
-      instruction_pointer: instruction_pointer + instruction_length(OpCodes.output())
+      program_counter: program_counter + instruction_length(OpCodes.output())
     )
     |> fix()
   end

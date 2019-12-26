@@ -14,7 +14,7 @@ defimpl Adapter, for: Intcode.ExecutionContext.Adapters.Memory do
     {:ok, input, struct(adapter, inputs: inputs)}
   end
 
-  def request_input(%ExecutionContext{adapter: %MemoryAdapter{inputs: []} = adapter} = context) do
+  def request_input(%ExecutionContext{adapter: %MemoryAdapter{inputs: []}}) do
     {:error, "No inputs left to get."}
   end
 
