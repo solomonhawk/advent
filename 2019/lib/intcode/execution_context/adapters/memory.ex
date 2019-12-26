@@ -4,8 +4,6 @@ defmodule Intcode.ExecutionContext.Adapters.Memory do
   def new(attrs) do
     struct(__MODULE__, attrs)
   end
-
-  def outputs(context), do: context.adapter.outputs
 end
 
 defimpl Adapter, for: Intcode.ExecutionContext.Adapters.Memory do
@@ -23,4 +21,6 @@ defimpl Adapter, for: Intcode.ExecutionContext.Adapters.Memory do
   def request_output(%MemoryAdapter{outputs: outputs} = adapter, output) do
     {:ok, output, struct(adapter, outputs: outputs ++ [output])}
   end
+
+  def outputs(adapter), do: adapter.outputs
 end

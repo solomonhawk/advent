@@ -24,7 +24,7 @@ defmodule Day5Test do
         |> Intcode.Processor.fix()
 
       assert ExecutionContext.events(context) == [read: 888, write: 888]
-      assert MemoryAdapter.outputs(context) == [888]
+      assert ExecutionContext.outputs(context) == [888]
     end
   end
 

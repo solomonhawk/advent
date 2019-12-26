@@ -13,6 +13,8 @@ defmodule Intcode.ExecutionContext do
 
   def program(%__MODULE__{program: program}), do: program
 
+  def outputs(%__MODULE__{adapter: adapter}), do: Adapter.outputs(adapter)
+
   def events(%__MODULE__{events: events}), do: Enum.reverse(events)
 
   def instruction_pointer(%__MODULE__{instruction_pointer: instruction_pointer}),

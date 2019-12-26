@@ -105,10 +105,11 @@ defmodule Day5.Part1 do
   def run do
     ExecutionContext.new(
       program: Day5.parse(),
+      # provide the processor with a single input which is "1"
       adapter: MemoryAdapter.new(inputs: [1])
     )
     |> Intcode.Processor.fix()
-    |> MemoryAdapter.outputs()
+    |> ExecutionContext.outputs()
     |> List.last()
   end
 end

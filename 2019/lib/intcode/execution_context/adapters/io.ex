@@ -26,4 +26,6 @@ defimpl Adapter, for: Intcode.ExecutionContext.Adapters.IO do
     IO.write(output)
     {:ok, output, adapter}
   end
+
+  def outputs, do: []
 end
