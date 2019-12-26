@@ -6,6 +6,13 @@ defmodule Day5Test do
   alias Intcode.ExecutionContext
   alias Intcode.ExecutionContext.Adapters.Memory, as: MemoryAdapter
 
+  @longer_part2_example """
+         3,21,1008,21,8,20,1005,20,22,107,8,21,20,1006,20,31,
+         1106,0,36,98,0,0,1002,21,125,20,4,20,1105,1,46,104,
+         999,1105,1,46,1101,1000,1,20,4,20,1105,1,46,98,99
+       """
+       |> Intcode.Program.parse()
+
   describe "Intcode.Processor with IO Adapter" do
     test "3,0,4,0,99 gets an input from :stdin and outputs it to :stdout" do
       output =
@@ -34,12 +41,53 @@ defmodule Day5Test do
     end
   end
 
+  describe "part 2 updates" do
+    test "position mode - 3,9,8,9,10,9,4,9,99,-1,8 outputs 1 if the input is 8" do
+      assert capture_io([input: "8", capture_prompt: false], fn ->
+               Intcode.Processor.fix([3, 9, 8, 9, 10, 9, 4, 9, 99, -1, 8])
+             end) == "1"
+    end
+
+    test "position mode - 3,9,8,9,10,9,4,9,99,-1,8 outputs 0 if the input is not 8" do
+      assert capture_io([input: "5", capture_prompt: false], fn ->
+               Intcode.Processor.fix([3, 9, 8, 9, 10, 9, 4, 9, 99, -1, 8])
+             end) == "0"
+    end
+
+    test "immediate mode - 3,3,1108,-1,8,3,4,3,99 outputs 1 if the input is 8" do
+      assert capture_io([input: "8", capture_prompt: false], fn ->
+               Intcode.Processor.fix([3, 3, 1108, -1, 8, 3, 4, 3, 99])
+             end) == "1"
+    end
+
+    test "immediate mode - 3,3,1108,-1,8,3,4,3,99 outputs 0 if the input is not 8" do
+      assert capture_io([input: "5", capture_prompt: false], fn ->
+               Intcode.Processor.fix([3, 3, 1108, -1, 8, 3, 4, 3, 99])
+             end) == "0"
+    end
+
+    test "larger example - outputs 999 if the input is less than 8" do
+      assert capture_io([input: "5", capture_prompt: false], fn ->
+               Intcode.Processor.fix(@longer_part2_example)
+             end) == "999"
+    end
+
+    test "larger example - outputs 1000 if the input is equal to 8" do
+      assert capture_io([input: "8", capture_prompt: false], fn ->
+               Intcode.Processor.fix(@longer_part2_example)
+             end) == "1000"
+    end
+
+    test "larger example - outputs 1001 if the input is greater than 8" do
+      assert capture_io([input: "9", capture_prompt: false], fn ->
+               Intcode.Processor.fix(@longer_part2_example)
+             end) == "1001"
+    end
+  end
+
   describe "part 2" do
-    # test "the prepared program yields 19690720 in position 0 when the correct values are substituted for position 1 and 2" do
-    #   # the final result is (100 * number1 + number2),
-    #   # where number1 is substituted at position 1
-    #   # and number2 is substituted at position 2
-    #   assert Day2.Part2.run() == 4112
-    # end
+    test "runs the TEST diagnostic program and gets the correct result" do
+      assert Day5.Part2.run() == nil
+    end
   end
 end

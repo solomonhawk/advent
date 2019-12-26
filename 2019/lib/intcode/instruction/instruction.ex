@@ -1,7 +1,7 @@
 defmodule Intcode.Instruction do
   defstruct op: nil, type: nil, parameters: []
 
-  import Intcode.Constants, only: [instruction_length: 1]
+  import Intcode.Constants, only: [inst_len: 1]
   import Intcode.OpCodes, only: [op_type: 1]
 
   alias Intcode.Instruction.Parameter
@@ -16,19 +16,19 @@ defmodule Intcode.Instruction do
     }
   end
 
-  def instruction_at(program, program_counter) do
+  def inst_at(program, program_counter) do
     program = Enum.drop(program, program_counter)
-    op = instruction_op(hd(program))
-    command = Enum.take(program, instruction_length(op))
+    op = inst_op(hd(program))
+    command = Enum.take(program, inst_len(op))
 
     new(op: hd(program), type: op_type(op), parameters: tl(command))
   end
 
   def parse_modes(op) do
-    [instruction_op(op), floor(op / 100) |> pad_left(0, 3)]
+    [inst_op(op), floor(op / 100) |> pad_left(0, 3)]
   end
 
-  def instruction_op(op), do: rem(op, 100)
+  def inst_op(op), do: rem(op, 100)
 
   def to_params(parameters, modes) do
     Enum.zip(parameters, modes) |> Enum.map(&Parameter.to_param/1)
