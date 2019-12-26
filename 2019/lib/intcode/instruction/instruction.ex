@@ -40,7 +40,8 @@ defmodule Intcode.Instruction do
     |> pad_left(padder, count)
   end
 
-  def pad_left(value, _, count) when is_list(value) and length(value) == count, do: value |> Enum.reverse
+  def pad_left(value, _, count) when is_list(value) and length(value) == count,
+    do: value |> Enum.reverse()
 
   def pad_left(value, padder, count) when is_list(value) do
     pad_left([padder | value], padder, count)

@@ -16,7 +16,6 @@ defmodule Intcode.Processor do
   end
 
   def fix(%ExecutionContext{program: program, instruction_pointer: instruction_pointer} = context) do
-
     program
     |> instruction_at(instruction_pointer)
     |> execute_instruction(context)
