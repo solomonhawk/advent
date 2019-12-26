@@ -27,9 +27,8 @@ defmodule Intcode.Processor do
         %ExecutionContext{program: program, instruction_pointer: instruction_pointer} = context
       )
       when op == OpCodes.add() do
-    # IO.inspect({:add, {[pointer: p1.value, value: deref(program, p1)]}, {[pointer: p2.value, value: deref(program, p2)]}, {:result, deref(program, p1) + deref(program, p2)}, {:to, p3.value}})
     context
-    |> ExecutionContext.update(
+    |> struct(
       program: List.replace_at(program, value_of(p3), deref(program, p1) + deref(program, p2)),
       instruction_pointer: instruction_pointer + instruction_length(OpCodes.add())
     )
@@ -42,9 +41,8 @@ defmodule Intcode.Processor do
         %ExecutionContext{program: program, instruction_pointer: instruction_pointer} = context
       )
       when op == OpCodes.mult() do
-    # IO.inspect({:mult, {[pointer: p1.value, value: deref(program, p1)]}, {[pointer: p2.value, value: deref(program, p2)]}, {:result, deref(program, p1) * deref(program, p2)}, {:to, p3.value}})
     context
-    |> ExecutionContext.update(
+    |> struct(
       program: List.replace_at(program, value_of(p3), deref(program, p1) * deref(program, p2)),
       instruction_pointer: instruction_pointer + instruction_length(OpCodes.mult())
     )
@@ -72,9 +70,8 @@ defmodule Intcode.Processor do
         %ExecutionContext{program: program, instruction_pointer: instruction_pointer} = context
       )
       when op == OpCodes.input() do
-    # IO.inspect({:input, {[value: deref(program, p2)]}, {:to, p1.value}})
     context
-    |> ExecutionContext.update(
+    |> struct(
       program: List.replace_at(program, value_of(p1), deref(program, p2)),
       instruction_pointer: instruction_pointer + instruction_length(OpCodes.input())
     )
@@ -92,9 +89,8 @@ defmodule Intcode.Processor do
       when op == OpCodes.output() do
     {_, context} = ExecutionContext.write(context, deref(program, p1))
 
-    # IO.inspect({:output, {:value, {p1.value, deref(program, p1)}}})
     context
-    |> ExecutionContext.update(
+    |> struct(
       program: program,
       instruction_pointer: instruction_pointer + instruction_length(OpCodes.output())
     )

@@ -1,34 +1,26 @@
 defmodule Intcode.ExecutionContext.Adapters.Memory do
   defstruct inputs: [], outputs: [], error: nil
 
-  alias Intcode.ExecutionContext
-
   def new(attrs) do
     struct(__MODULE__, attrs)
   end
 
   def outputs(context), do: context.adapter.outputs
+end
 
-  def request_input(
-        %ExecutionContext{adapter: %__MODULE__{inputs: [input | inputs]} = adapter} = context
-      ) do
-    {input, %ExecutionContext{context | adapter: %__MODULE__{adapter | inputs: inputs}}}
+defimpl Adapter, for: Intcode.ExecutionContext.Adapters.Memory do
+  alias Intcode.ExecutionContext
+  alias Intcode.ExecutionContext.Adapters.Memory, as: MemoryAdapter
+
+  def request_input(%MemoryAdapter{inputs: [input | inputs]} = adapter) do
+    {:ok, input, struct(adapter, inputs: inputs)}
   end
 
-  def request_input(%ExecutionContext{adapter: %__MODULE__{inputs: []} = adapter} = context) do
-    {:error,
-     ExecutionContext.update(context,
-       adapter: %__MODULE__{adapter | error: "No inputs left to get."}
-     )}
+  def request_input(%ExecutionContext{adapter: %MemoryAdapter{inputs: []} = adapter} = context) do
+    {:error, "No inputs left to get."}
   end
 
-  def request_output(
-        %ExecutionContext{adapter: %__MODULE__{outputs: outputs} = adapter} = context,
-        output
-      ) do
-    {output,
-     ExecutionContext.update(context,
-       adapter: %__MODULE__{adapter | outputs: outputs ++ [output]}
-     )}
+  def request_output(%MemoryAdapter{outputs: outputs} = adapter, output) do
+    {:ok, output, struct(adapter, outputs: outputs ++ [output])}
   end
 end
