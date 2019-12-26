@@ -87,7 +87,7 @@ defmodule Day5Test do
 
   describe "part 2" do
     test "runs the TEST diagnostic program and gets the correct result" do
-      assert Day5.Part2.run() == 447803
+      assert Day5.Part2.run() == 447_803
     end
   end
 end
