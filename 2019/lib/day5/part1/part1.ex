@@ -98,8 +98,17 @@ defmodule Day5.Part1 do
   After providing 1 to the only input instruction and passing all the tests, what
   diagnostic code does the program produce?
   """
+
+  alias Intcode.ExecutionContext
+  alias Intcode.ExecutionContext.Adapters.Memory, as: MemoryAdapter
+
   def run do
-    Day5.parse()
-    |> Intcode.Fixer.fix()
+    ExecutionContext.new(
+      program: Day5.parse(),
+      adapter: MemoryAdapter.new(inputs: [1])
+    )
+    |> Intcode.Processor.fix()
+    |> MemoryAdapter.outputs()
+    |> List.last()
   end
 end

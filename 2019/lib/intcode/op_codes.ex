@@ -12,4 +12,10 @@ defmodule Intcode.OpCodes do
   define(input, @input)
   define(output, @output)
   define(halt, @halt)
+
+  def op_type(@add), do: :add
+  def op_type(@mult), do: :mult
+  def op_type(@input), do: :input
+  def op_type(@output), do: :output
+  def op_type(@halt), do: :halt
 end

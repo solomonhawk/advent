@@ -1,26 +1,27 @@
 defmodule Intcode.Instruction do
-  defstruct op: nil, parameters: []
+  defstruct op: nil, type: nil, parameters: []
 
   import Intcode.Constants, only: [instruction_length: 1]
+  import Intcode.OpCodes, only: [op_type: 1]
 
-  alias __MODULE__
   alias Intcode.Instruction.Parameter
 
-  def new(op: op, parameters: parameters) do
+  def new(op: op, type: type, parameters: parameters) do
     [instruction, modes] = parse_modes(op)
 
-    %Instruction{
+    %__MODULE__{
       op: instruction,
+      type: type,
       parameters: to_params(parameters, modes)
     }
   end
 
   def instruction_at(program, instr_pointer) do
     program = Enum.drop(program, instr_pointer)
-    op = Instruction.instruction_op(hd(program))
+    op = instruction_op(hd(program))
     command = Enum.take(program, instruction_length(op))
 
-    Instruction.new(op: op, parameters: tl(command))
+    new(op: hd(program), type: op_type(op), parameters: tl(command))
   end
 
   def parse_modes(op) do
@@ -39,7 +40,7 @@ defmodule Intcode.Instruction do
     |> pad_left(padder, count)
   end
 
-  def pad_left(value, _, count) when is_list(value) and length(value) == count, do: value
+  def pad_left(value, _, count) when is_list(value) and length(value) == count, do: value |> Enum.reverse
 
   def pad_left(value, padder, count) when is_list(value) do
     pad_left([padder | value], padder, count)

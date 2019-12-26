@@ -82,6 +82,9 @@ defmodule Day2.Part1 do
   program, replace position 1 with the value 12 and replace position 2 with the
   value 2. What value is left at position 0 after the program halts?
   """
+
+  alias Intcode.ExecutionContext
+
   def run do
     Day2.parse()
     # replace the value at position 1 with 12
@@ -89,7 +92,8 @@ defmodule Day2.Part1 do
     # replace the value at position 2 with 2
     |> List.replace_at(2, 2)
     # execute the program
-    |> Intcode.Fixer.fix()
+    |> Intcode.Processor.fix()
+    |> ExecutionContext.program()
     # output the first value
     |> hd()
   end

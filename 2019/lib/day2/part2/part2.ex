@@ -47,6 +47,9 @@ defmodule Day2.Part2 do
   19690720. What is 100 * noun + verb? (For example, if noun=12 and verb=2, the
   answer would be 1202.)
   """
+
+  alias Intcode.ExecutionContext
+
   def run do
     input = Day2.parse()
 
@@ -58,7 +61,8 @@ defmodule Day2.Part2 do
             input
             |> List.replace_at(1, x)
             |> List.replace_at(2, y)
-            |> Intcode.Fixer.fix()
+            |> Intcode.Processor.fix()
+            |> ExecutionContext.program()
             |> hd()
 
           case result do
