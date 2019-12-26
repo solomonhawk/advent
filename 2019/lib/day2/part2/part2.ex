@@ -48,7 +48,7 @@ defmodule Day2.Part2 do
   answer would be 1202.)
   """
   def run do
-    input = parse()
+    input = Day2.parse()
 
     # try all combinations of pairs of numbers within the valid input range
     {i1, i2} =
@@ -69,11 +69,5 @@ defmodule Day2.Part2 do
       end)
 
     100 * i1 + i2
-  end
-
-  def parse do
-    File.read!(Path.join(__DIR__, "../input.txt"))
-    |> String.split(",", trim: true)
-    |> Enum.map(&(Integer.parse(&1) |> elem(0)))
   end
 end

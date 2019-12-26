@@ -83,7 +83,7 @@ defmodule Day2.Part1 do
   value 2. What value is left at position 0 after the program halts?
   """
   def run do
-    parse()
+    Day2.parse()
     # replace the value at position 1 with 12
     |> List.replace_at(1, 12)
     # replace the value at position 2 with 2
@@ -92,11 +92,5 @@ defmodule Day2.Part1 do
     |> Intcode.Fixer.fix()
     # output the first value
     |> hd()
-  end
-
-  def parse do
-    File.read!(Path.join(__DIR__, "../input.txt"))
-    |> String.split(",", trim: true)
-    |> Enum.map(&(Integer.parse(&1) |> elem(0)))
   end
 end
