@@ -90,10 +90,7 @@ defmodule Intcode.Processor do
     {_, context} = ExecutionContext.write(context, deref(program, p1))
 
     context
-    |> struct(
-      program: program,
-      program_counter: program_counter + inst_len(OpCodes.output())
-    )
+    |> struct(program_counter: program_counter + inst_len(OpCodes.output()))
     |> fix()
   end
 

@@ -20,6 +20,13 @@ defmodule Trajectory.OrbitMap do
     orbits
   end
 
+  def orbital_transfers(%__MODULE__{graph: graph}, from, to) do
+    start = Graph.node(graph, from)
+    finish = Graph.node(graph, to)
+
+    Graph.min_distance(graph, start.parent, finish.parent)
+  end
+
   # private
 
   defp parse_graph(%__MODULE__{graph: graph, input: [{t, s} | rest]} = map) do
@@ -29,5 +36,4 @@ defmodule Trajectory.OrbitMap do
   defp parse_graph(%__MODULE__{graph: graph, input: []} = map) do
     struct(map, graph: Graph.new(graph))
   end
-
 end

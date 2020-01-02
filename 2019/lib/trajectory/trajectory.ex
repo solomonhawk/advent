@@ -15,4 +15,8 @@ defmodule Trajectory do
   def checksum(%OrbitMap{} = map) do
     OrbitMap.count_orbits(map)
   end
+
+  def transfers(%OrbitMap{} = map, from, to) do
+    OrbitMap.orbital_transfers(map, from, to)
+  end
 end

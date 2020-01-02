@@ -19,8 +19,8 @@ defimpl Adapter, for: Intcode.ExecutionContext.Adapters.Memory do
   end
 
   def request_output(%MemoryAdapter{outputs: outputs} = adapter, output) do
-    {:ok, output, struct(adapter, outputs: outputs ++ [output])}
+    {:ok, output, struct(adapter, outputs: [output | outputs])}
   end
 
-  def outputs(adapter), do: adapter.outputs
+  def outputs(adapter), do: adapter.outputs |> Enum.reverse()
 end
