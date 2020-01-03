@@ -11,11 +11,11 @@ defmodule Intcode.Processor do
   import Intcode.Constants, only: [inst_len: 1]
   import Intcode.Instruction, only: [inst_at: 2]
 
-  def fix(program) when is_list(program) do
-    ExecutionContext.new(program: program) |> fix()
+  def run(program) when is_list(program) do
+    ExecutionContext.new(program: program) |> run()
   end
 
-  def fix(%ExecutionContext{program: program, program_counter: program_counter} = context) do
+  def run(%ExecutionContext{program: program, program_counter: program_counter} = context) do
     program
     |> inst_at(program_counter)
     |> execute_instruction(context)
@@ -32,7 +32,7 @@ defmodule Intcode.Processor do
       program: List.replace_at(program, value_of(p3), deref(program, p1) + deref(program, p2)),
       program_counter: program_counter + inst_len(OpCodes.add())
     )
-    |> fix()
+    |> run()
   end
 
   # multiply (2)
@@ -46,7 +46,7 @@ defmodule Intcode.Processor do
       program: List.replace_at(program, value_of(p3), deref(program, p1) * deref(program, p2)),
       program_counter: program_counter + inst_len(OpCodes.mult())
     )
-    |> fix()
+    |> run()
   end
 
   # input (3)
@@ -75,7 +75,7 @@ defmodule Intcode.Processor do
       program: List.replace_at(program, value_of(p1), deref(program, p2)),
       program_counter: program_counter + inst_len(OpCodes.input())
     )
-    |> fix()
+    |> run()
   end
 
   # output (4)
@@ -91,7 +91,7 @@ defmodule Intcode.Processor do
 
     context
     |> struct(program_counter: program_counter + inst_len(OpCodes.output()))
-    |> fix()
+    |> run()
   end
 
   # jump_if_true (5)
@@ -105,7 +105,7 @@ defmodule Intcode.Processor do
 
     context
     |> jump(should_jump, program_counter, OpCodes.jump_if_true(), destination)
-    |> fix()
+    |> run()
   end
 
   # jump_if_false (6)
@@ -119,7 +119,7 @@ defmodule Intcode.Processor do
 
     context
     |> jump(should_jump, program_counter, OpCodes.jump_if_false(), destination)
-    |> fix()
+    |> run()
   end
 
   # less_than (7)
@@ -135,7 +135,7 @@ defmodule Intcode.Processor do
       program: List.replace_at(program, value_of(p3), value),
       program_counter: program_counter + inst_len(OpCodes.less_than())
     )
-    |> fix()
+    |> run()
   end
 
   # equals (8)
@@ -151,7 +151,7 @@ defmodule Intcode.Processor do
       program: List.replace_at(program, value_of(p3), value),
       program_counter: program_counter + inst_len(OpCodes.equals())
     )
-    |> fix()
+    |> run()
   end
 
   # halt

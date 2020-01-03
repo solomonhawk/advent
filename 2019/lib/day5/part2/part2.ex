@@ -73,7 +73,7 @@ defmodule Day5.Part2 do
       program: Day5.parse(),
       adapter: MemoryAdapter.new(inputs: [5])
     )
-    |> Intcode.Processor.fix()
+    |> Intcode.Processor.run()
     |> ExecutionContext.outputs()
     |> List.last()
   end

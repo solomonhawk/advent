@@ -92,7 +92,7 @@ defmodule Day2.Part1 do
     # replace the value at position 2 with 2
     |> List.replace_at(2, 2)
     # execute the program
-    |> Intcode.Processor.fix()
+    |> Intcode.Processor.run()
     |> ExecutionContext.program()
     # output the first value
     |> hd()

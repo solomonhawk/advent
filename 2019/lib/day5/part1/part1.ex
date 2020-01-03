@@ -108,7 +108,7 @@ defmodule Day5.Part1 do
       # provide the processor with a single input which is "1"
       adapter: MemoryAdapter.new(inputs: [1])
     )
-    |> Intcode.Processor.fix()
+    |> Intcode.Processor.run()
     |> ExecutionContext.outputs()
     |> List.last()
   end

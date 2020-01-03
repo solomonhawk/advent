@@ -28,4 +28,6 @@ defimpl Adapter, for: Intcode.ExecutionContext.Adapters.IO do
   end
 
   def outputs(_), do: []
+
+  def put_input(adapter, _), do: adapter
 end

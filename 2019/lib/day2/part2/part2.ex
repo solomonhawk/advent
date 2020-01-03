@@ -61,7 +61,7 @@ defmodule Day2.Part2 do
             input
             |> List.replace_at(1, x)
             |> List.replace_at(2, y)
-            |> Intcode.Processor.fix()
+            |> Intcode.Processor.run()
             |> ExecutionContext.program()
             |> hd()
 

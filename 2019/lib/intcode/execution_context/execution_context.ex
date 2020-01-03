@@ -48,6 +48,10 @@ defmodule Intcode.ExecutionContext do
     struct(context, adapter: struct(adapter, error: error))
   end
 
+  def put_input(%__MODULE__{adapter: adapter} = context, input) do
+    struct(context, adapter: Adapter.put_input(adapter, input))
+  end
+
   def handle_error(context, reason) do
     if Keyword.get(context.opts, :throw_errors, true) == true do
       raise RuntimeError, message: reason

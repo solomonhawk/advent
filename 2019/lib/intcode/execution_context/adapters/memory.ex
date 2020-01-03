@@ -1,7 +1,7 @@
 defmodule Intcode.ExecutionContext.Adapters.Memory do
   defstruct inputs: [], outputs: [], error: nil
 
-  def new(attrs) do
+  def new(attrs \\ []) do
     struct(__MODULE__, attrs)
   end
 end
@@ -20,6 +20,10 @@ defimpl Adapter, for: Intcode.ExecutionContext.Adapters.Memory do
 
   def request_output(%MemoryAdapter{outputs: outputs} = adapter, output) do
     {:ok, output, struct(adapter, outputs: [output | outputs])}
+  end
+
+  def put_input(%MemoryAdapter{inputs: inputs} = adapter, input) do
+    struct(adapter, inputs: inputs ++ [input])
   end
 
   def outputs(adapter), do: adapter.outputs |> Enum.reverse()

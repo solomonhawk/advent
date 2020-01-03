@@ -7,4 +7,7 @@ defprotocol Adapter do
 
   @doc "Collects the outputs for an adapter"
   def outputs(adapter)
+
+  @doc "Adds a value to the input buffer"
+  def put_input(adapter, input)
 end
