@@ -1,0 +1,6 @@
+[package]
+name = "advent_2020"
+version = "1.0.0"
+
+[lib]
+path = "main.rs"
