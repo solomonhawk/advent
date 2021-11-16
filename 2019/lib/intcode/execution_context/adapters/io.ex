@@ -6,10 +6,10 @@ defimpl Adapter, for: Intcode.ExecutionContext.Adapters.IO do
   def request_input(adapter) do
     case IO.gets("Enter a number.\n") do
       :eof ->
-        {:error, "Error: input instruction encountered EOF"}
+        {:error, :bad_input, "Error: input instruction encountered EOF"}
 
       {:error, reason} ->
-        {:error, "Error: input instruction - " <> reason}
+        {:error, :bad_input, "Error: input instruction - " <> reason}
 
       data ->
         case Integer.parse(data) do
@@ -17,7 +17,7 @@ defimpl Adapter, for: Intcode.ExecutionContext.Adapters.IO do
             {:ok, number, adapter}
 
           :error ->
-            {:error, "Error: input instruction - must be an integer"}
+            {:error, :bad_input, "Error: input instruction - must be an integer"}
         end
     end
   end
@@ -30,4 +30,5 @@ defimpl Adapter, for: Intcode.ExecutionContext.Adapters.IO do
   def outputs(_), do: []
 
   def put_input(adapter, _), do: adapter
+  def take_output(adapter), do: adapter
 end

@@ -157,7 +157,7 @@ defmodule Intcode.Processor do
   # halt
   def execute_instruction(%Instruction{op: op}, %ExecutionContext{} = context)
       when op == OpCodes.halt() do
-    context
+    ExecutionContext.put_status(context, :halted)
   end
 
   def jump(context, false, program_counter, instruction, _) do

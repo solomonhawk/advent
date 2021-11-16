@@ -15,6 +15,7 @@ defmodule Day7.Part1 do
       O-------O  O-------O  O-------O  O-------O  O-------O
   0 ->| Amp A |->| Amp B |->| Amp C |->| Amp D |->| Amp E |-> (to thrusters)
       O-------O  O-------O  O-------O  O-------O  O-------O
+
   The Elves have sent you some Amplifier Controller Software (your puzzle
   input), a program that should run on your existing Intcode computer. Each
   amplifier will need to run a copy of the program.

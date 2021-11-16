@@ -96,7 +96,7 @@ defmodule Trajectory.Graph do
   end
 
   defp distance(graph, from, to)
-      when (is_binary(from) or is_atom(from)) and (is_binary(to) or is_atom(to)) do
+       when (is_binary(from) or is_atom(from)) and (is_binary(to) or is_atom(to)) do
     distance(graph, node(graph, from), node(graph, to), 0)
   end
 

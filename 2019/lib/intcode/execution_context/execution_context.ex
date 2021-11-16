@@ -3,13 +3,34 @@ defmodule Intcode.ExecutionContext do
 
   defstruct program: [],
             program_counter: 0,
+            status: :idle,
             adapter: %Adapters.IO{},
             opts: [throw_errors: true],
             events: []
 
+  @type status ::
+          :idle
+          | :waiting
+          | :error
+          | :halted
+
+  @type t :: %__MODULE__{
+          program: list(integer()),
+          program_counter: non_neg_integer(),
+          status: status(),
+          adapter: struct(),
+          opts: [throw_errors: boolean()],
+          events: list(tuple())
+        }
+
   def new(attrs) do
     struct(__MODULE__, attrs)
   end
+
+  def halted?(%__MODULE__{status: :halted}), do: true
+  def halted?(%__MODULE__{}), do: false
+
+  def status(%__MODULE__{status: status}), do: status
 
   def program(%__MODULE__{program: program}), do: program
 
@@ -22,8 +43,8 @@ defmodule Intcode.ExecutionContext do
 
   def read(%__MODULE__{adapter: adapter} = context) do
     case Adapter.request_input(adapter) do
-      {:error, reason} ->
-        handle_error(context, reason)
+      {:error, status, reason} ->
+        handle_error(context, status, reason)
 
       {:ok, result, updated_adapter} ->
         {result, struct(context, adapter: updated_adapter) |> put_event(:read, result)}
@@ -32,8 +53,8 @@ defmodule Intcode.ExecutionContext do
 
   def write(%__MODULE__{adapter: adapter} = context, output) do
     case Adapter.request_output(adapter, output) do
-      {:error, reason} ->
-        handle_error(context, reason)
+      {:error, status, reason} ->
+        handle_error(context, status, reason)
 
       {:ok, result, updated_adapter} ->
         {result, struct(context, adapter: updated_adapter) |> put_event(:write, result)}
@@ -45,18 +66,33 @@ defmodule Intcode.ExecutionContext do
   end
 
   def put_error(%__MODULE__{adapter: adapter} = context, error) do
-    struct(context, adapter: struct(adapter, error: error))
+    struct(context, status: :error, adapter: struct(adapter, error: error))
+  end
+
+  def put_status(%__MODULE__{} = context, status) do
+    struct(context, status: status)
   end
 
   def put_input(%__MODULE__{adapter: adapter} = context, input) do
     struct(context, adapter: Adapter.put_input(adapter, input))
   end
 
-  def handle_error(context, reason) do
+  def take_output(%__MODULE__{adapter: adapter} = context) do
+    {output, adapter} = Adapter.take_output(adapter)
+    {output, struct(context, adapter: adapter)}
+  end
+
+  def handle_error(context, status, reason) do
     if Keyword.get(context.opts, :throw_errors, true) == true do
       raise RuntimeError, message: reason
     end
 
-    put_error(context, reason)
+    case status do
+      :no_input_available ->
+        put_status(context, :waiting)
+
+      _ ->
+        put_error(context, reason)
+    end
   end
 end

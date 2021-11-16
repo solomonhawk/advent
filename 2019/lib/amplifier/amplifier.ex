@@ -2,10 +2,16 @@ defmodule Amplifier do
   alias Intcode.{Processor, ExecutionContext}
   alias Intcode.ExecutionContext.Adapters.Memory, as: MemoryAdapter
 
-  @inputs [0, 1, 2, 3, 4]
+  import Helpers.List, only: [permutations: 1]
 
-  def optimize(program) do
-    Enum.reduce(permutations(@inputs), 0, fn phase_settings, max_thrust ->
+  @series_phases [0, 1, 2, 3, 4]
+  @loop_phases [5, 6, 7, 8, 9]
+
+  def optimize(program, mode \\ :series) do
+    mode
+    |> inputs_for_mode()
+    |> permutations()
+    |> Enum.reduce(0, fn phase_settings, max_thrust ->
       max(max_thrust, Amplifier.calculate(program, phase_settings))
     end)
   end
@@ -20,12 +26,11 @@ defmodule Amplifier do
     end)
   end
 
+  def inputs_for_mode(:series), do: @series_phases
+  def inputs_for_mode(:loop), do: @loop_phases
+  def inputs_for_mode(mode), do: raise("Invalid amplifier mode '#{mode}'")
+
   def context(program, inputs) do
     ExecutionContext.new(program: program, adapter: MemoryAdapter.new(inputs: inputs))
-  end
-
-  def permutations([]), do: [[]]
-  def permutations(list) do
-    for elem <- list, rest <- permutations(list -- [elem]), do: [elem|rest]
   end
 end

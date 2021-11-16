@@ -10,4 +10,7 @@ defprotocol Adapter do
 
   @doc "Adds a value to the input buffer"
   def put_input(adapter, input)
+
+  @doc "Takes a value from the output buffer"
+  def take_output(adapter)
 end
