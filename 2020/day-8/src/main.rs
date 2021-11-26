@@ -75,6 +75,7 @@
 
 // Fix the program so that it terminates normally by changing exactly one jmp (to nop) or nop (to jmp). What is the value of the accumulator after the program terminates?
 
+use std::clone;
 use std::error::Error;
 use std::fmt;
 use std::fs;
@@ -94,7 +95,7 @@ impl fmt::Display for ParseError {
 
 impl Error for ParseError {}
 
-#[derive(Debug, Default)]
+#[derive(Clone, Debug, Default)]
 struct Bootloader {
     pub program: Program,
     pub acc: i32,
@@ -138,6 +139,17 @@ impl Bootloader {
 
         self
     }
+
+    fn reset(&mut self) -> &mut Self {
+        self.acc = 0;
+        self.program_counter = 0;
+        self.halted = false;
+        self
+    }
+
+    fn completed(&self) -> bool {
+        self.program_counter == self.program.instructions.len().try_into().unwrap()
+    }
 }
 
 #[derive(Debug, Default)]
@@ -159,9 +171,33 @@ impl Program {
     fn parse_instruction(line: &str) -> Result<Inst, Box<dyn Error>> {
         Ok(Inst::from_str(line)?)
     }
+
+    fn fix_inst(&mut self, i: usize) -> &mut Self {
+        match self.instructions[i] {
+            Inst::Nop(a) => {
+                println!("Replacing Nop({}) with Jmp at index: {}", a, i);
+                self.instructions[i] = Inst::Jmp(a);
+            }
+            Inst::Jmp(a) => {
+                println!("Replacing Jmp({}) with Nop at index: {}", a, i);
+                self.instructions[i] = Inst::Nop(a);
+            }
+            _ => unreachable!("Invalid index passed to fix_inst/2"),
+        }
+
+        self
+    }
 }
 
-#[derive(Debug)]
+impl Clone for Program {
+    fn clone(&self) -> Program {
+        Program {
+            instructions: self.instructions.clone(),
+        }
+    }
+}
+
+#[derive(PartialEq, Clone, Copy, Debug)]
 enum Inst {
     Nop(i32),
     Acc(i32),
@@ -196,6 +232,39 @@ impl FromStr for Inst {
     }
 }
 
+fn part2() {
+    let mut bl = Bootloader::new();
+
+    bl.load_program("input.txt").unwrap_or_else(|e| {
+        println!("Failed to parse program text! {:?}", e);
+        process::exit(1)
+    });
+
+    for i in 0..bl.program.instructions.len() {
+        // skip Acc instructions, they can't be fixed!
+        if let Inst::Acc(_) = bl.program.instructions[i] {
+            continue;
+        }
+
+        // make a mutable copy of the Bootloader so we can step through the program and accumulate
+        let mut fixed_bl = bl.clone();
+
+        // fix the current instruction
+        fixed_bl.program = fixed_bl.program.fix_inst(i).to_owned();
+
+        // run to completion or halt
+        while !(fixed_bl.completed() || fixed_bl.halted) {
+            fixed_bl.step();
+        }
+
+        // if completed, this instruction's replacement was the correct one
+        if fixed_bl.completed() {
+            println!("{:#?}", fixed_bl.acc);
+            return;
+        }
+    }
+}
+
 fn part1() {
     let mut bl = Bootloader::new();
 
@@ -211,21 +280,6 @@ fn part1() {
     println!("{:#?}", bl.acc);
 }
 
-// fn part2() {
-//     let mut bl = Bootloader::new();
-
-//     bl.load_program("input.txt").unwrap_or_else(|e| {
-//         println!("Failed to parse program text! {:?}", e);
-//         process::exit(1)
-//     });
-
-//     while !bl.halted {
-//         bl.step();
-//     }
-
-//     println!("{:#?}", bl.acc);
-// }
-
 fn main() {
-    part1()
+    part2()
 }
