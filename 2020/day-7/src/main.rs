@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 // --- Day 7: Handy Haversacks ---
 // You land at the regional airport in time for your next flight. In fact, it looks like you'll even have time to grab some food: all flights are currently delayed due to issues in luggage processing.
 
@@ -27,80 +28,100 @@
 // So, in this example, the number of bag colors that can eventually contain at least one shiny gold bag is 4.
 
 // How many bag colors can eventually contain at least one shiny gold bag? (The list of rules is quite long; make sure you get all of it.)
-
-use std::collections::HashMap;
-use std::collections::HashSet;
+use lazy_static::lazy_static;
+use regex::Regex;
+use std::collections::{HashMap, HashSet};
 use std::fs;
 use std::process;
 
-#[derive(Debug, Copy, Eq, Hash, PartialEq, Clone)]
-pub enum BagColor {
-    LightRed,
-    DarkOrange,
-    BrightWhite,
-    MutedYellow,
-    ShinyGold,
-    DarkOlive,
-    VibrantPlum,
-    FadedBlue,
-    DottedBlack,
+#[derive(Debug, Clone)]
+struct ParseError;
+
+#[derive(Debug, Clone)]
+struct BagRule<'a> {
+    color: &'a str,
+    contents: HashMap<&'a str, BagContents<'a>>,
 }
 
-#[derive(Clone)]
-pub struct BagRule {
-    pub color: BagColor,
-    pub contained_by: Vec<BagColor>,
+#[derive(Debug, Clone)]
+struct BagContents<'a> {
+    color: &'a str,
+    count: u32,
 }
 
-pub struct BagManager {
-    // color: c1 -> colors that can contain c1
-    rules: HashMap<BagColor, Vec<BagColor>>,
+#[derive(Debug)]
+struct BagManager<'a> {
+    rules: HashMap<&'a str, BagRule<'a>>,
 }
 
-impl BagManager {
-    fn new() -> BagManager {
+impl<'a> BagManager<'a> {
+    fn parse_rules(string: &'a str) -> BagManager<'a> {
+        let rules = string
+            .split("\n")
+            .map(|line| BagManager::parse_line(line))
+            .filter_map(|r| r.ok());
+
         BagManager {
-            rules: vec![
-                (BagColor::LightRed, vec![]),
-                (
-                    BagColor::MutedYellow,
-                    vec![BagColor::LightRed, BagColor::DarkOrange],
-                ),
-                (
-                    BagColor::BrightWhite,
-                    vec![BagColor::LightRed, BagColor::DarkOrange],
-                ),
-                (
-                    BagColor::ShinyGold,
-                    vec![BagColor::BrightWhite, BagColor::MutedYellow],
-                ),
-                (
-                    BagColor::FadedBlue,
-                    vec![
-                        BagColor::MutedYellow,
-                        BagColor::DarkOlive,
-                        BagColor::VibrantPlum,
-                    ],
-                ),
-                (BagColor::DarkOlive, vec![BagColor::ShinyGold]),
-                (BagColor::VibrantPlum, vec![BagColor::ShinyGold]),
-                (
-                    BagColor::DottedBlack,
-                    vec![BagColor::DarkOlive, BagColor::VibrantPlum],
-                ),
-            ]
-            .iter()
-            .cloned()
-            .collect(),
+            rules: rules.map(|r| (r.color, r)).collect(),
         }
     }
 
-    fn contained_by(&self, color: &BagColor) -> Option<&Vec<BagColor>> {
-        self.rules.get(color)
+    fn parse_line(line: &str) -> Result<BagRule, ParseError> {
+        lazy_static! {
+            static ref LINE_PATTERN: Regex =
+                Regex::new(r"^(?P<count>\d) (?P<color>\w+ \w+)$").unwrap();
+        }
+
+        let parts: Vec<&str> = line.split(" bags contain ").collect();
+        let color = parts[0];
+        let rules = parts[1]
+            .split(", ")
+            .map(|s| {
+                s.trim_end_matches(".")
+                    .trim_end_matches(" bags")
+                    .trim_end_matches(" bag")
+            })
+            .filter_map(|rule| {
+                if let Some(c) = LINE_PATTERN.captures(rule) {
+                    Some(BagContents {
+                        count: u32::from_str_radix(c.name("count").map(|x| x.as_str())?, 10)
+                            .unwrap(),
+                        color: c.name("color").map(|x| x.as_str())?,
+                    })
+                } else {
+                    None
+                }
+            });
+
+        Ok(BagRule {
+            color: color,
+            contents: rules.map(|r| (r.color, r)).collect(),
+        })
     }
 
-    fn find_bags_containing(&self, color: &BagColor) -> HashSet<BagColor> {
-        match self.contained_by(color) {
+    // this is very inefficient
+    fn containing(&'a self, color: &str) -> Option<Vec<&'a str>> {
+        let s: Vec<&str> = self
+            .rules
+            .iter()
+            .filter_map(|(&c, rule)| {
+                if rule.contents.contains_key(color) {
+                    Some(c)
+                } else {
+                    None
+                }
+            })
+            .collect();
+
+        if s.len() > 0 {
+            Some(s)
+        } else {
+            None
+        }
+    }
+
+    fn find_bags_containing(&self, color: &str) -> HashSet<&'_ str> {
+        match self.containing(color) {
             Some(containers) => containers
                 .to_vec()
                 .into_iter()
@@ -109,18 +130,39 @@ impl BagManager {
             None => HashSet::new(),
         }
     }
+
+    fn find_bags_contained_by(&self, color: &str) -> u32 {
+        self.rules[color]
+            .contents
+            .iter()
+            .map(|(&c, contents)| contents.count + contents.count * self.find_bags_contained_by(c))
+            .sum()
+    }
+}
+
+fn part1(manager: &BagManager) {
+    let containers: HashSet<&str> = manager.find_bags_containing("shiny gold");
+
+    println!(
+        "Bags that can contain at least 1 shiny gold bag: {:#?}",
+        containers.len()
+    );
+}
+
+fn part2(manager: &BagManager) {
+    let result = manager.find_bags_contained_by("shiny gold");
+
+    println!("{:#?}", result);
 }
 
 fn main() {
-    // let rules = fs::read_to_string("input.txt").unwrap_or_else(|error| {
-    //     println!("Failed to parse input. {}", error);
-    //     process::exit(1);
-    // });
+    let rules = fs::read_to_string("input.txt").unwrap_or_else(|error| {
+        println!("Failed to parse input. {}", error);
+        process::exit(1);
+    });
 
-    // let manager = BagManager::parse_rules(rules);
-    let manager = BagManager::new();
+    let manager = BagManager::parse_rules(&rules);
 
-    let containers: HashSet<BagColor> = manager.find_bags_containing(&BagColor::ShinyGold);
-
-    println!("{:?}", containers);
+    // part1(&manager)
+    part2(&manager)
 }
