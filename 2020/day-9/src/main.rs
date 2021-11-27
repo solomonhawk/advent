@@ -388,17 +388,17 @@
 
 use std::{collections::HashMap, fs};
 
-type Width = i32;
-type Length = i32;
-type Height = i32;
+type X = i32;
+type Y = i32;
+type Z = i32;
+type W = i32;
 
 #[derive(PartialEq, Eq, Hash, Debug, Clone, Copy)]
-struct Cube(Width, Length, Height);
+struct Cube(X, Y, Z, W);
 
 #[derive(Debug)]
 struct ConwayDimension {
     cubes: HashMap<Cube, bool>,
-    // dimensions: (Width, Length, Height),
 }
 
 impl ConwayDimension {
@@ -416,7 +416,7 @@ impl ConwayDimension {
                 }
 
                 row.chars().enumerate().filter_map(move |(x, s)| match s {
-                    '#' => Some((Cube(x as Width, y as Length, 0), true)),
+                    '#' => Some((Cube(x as X, y as Y, 0, 0), true)),
                     '.' => None,
                     _ => None,
                 })
@@ -428,15 +428,12 @@ impl ConwayDimension {
 
     fn cycle(&mut self) {
         let mut next_cubes = self.cubes.clone();
-        // let mut visited_cubes = HashMap::new();
 
         // for each active cube in simulation
         for (cube, _) in &self.cubes {
             // get all the neighboring positions excluding
             let neighbor_positions = self.neighbor_positions(&cube);
             let live_neighbors = self.live_neighbors(&neighbor_positions);
-
-            // visited_cubes.insert(cube, true);
 
             // die of under/overcrowding
             if !(live_neighbors == 2 || live_neighbors == 3) {
@@ -445,6 +442,7 @@ impl ConwayDimension {
 
             // check edge positions
             for neighbor in &neighbor_positions {
+                // if there's a live cube here already, skip it
                 if self.has_alive_cube(&neighbor) {
                     continue;
                 }
@@ -465,16 +463,18 @@ impl ConwayDimension {
 
     fn neighbor_positions(&self, cube: &Cube) -> Vec<Cube> {
         let mut positions = Vec::new();
-        let Cube(ox, oy, oz) = cube;
+        let Cube(ox, oy, oz, ow) = cube;
 
         for z in (oz - 1)..(oz + 2) {
             for x in (ox - 1)..(ox + 2) {
                 for y in (oy - 1)..(oy + 2) {
-                    if (x, y, z) == (*ox, *oy, *oz) {
-                        continue;
-                    }
+                    for w in (ow - 1)..(ow + 2) {
+                        if (x, y, z, w) == (*ox, *oy, *oz, *ow) {
+                            continue;
+                        }
 
-                    positions.push(Cube(x, y, z))
+                        positions.push(Cube(x, y, z, w))
+                    }
                 }
             }
         }
