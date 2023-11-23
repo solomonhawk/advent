@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+set -xe
+
+if [ ! -x "$(command -v rustup)" ]; then
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+else
+  rustup update
+fi
+
+if [ ! -x "$(command -v just)" ]; then
+  brew install just
+fi
