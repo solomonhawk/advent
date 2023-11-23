@@ -1,0 +1,12 @@
+{
+  "[dune]": {
+    "editor.formatOnSave": true
+  },
+  "[reason]": {
+    "editor.formatOnSave": true
+  },
+  "ocaml.sandbox": {
+    "kind": "esy",
+    "root": "${workspaceFolder:2023}"
+  }
+}

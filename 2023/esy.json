@@ -1,0 +1,25 @@
+{
+  "name": "aoc-2023",
+  "dependencies": {
+    "ocaml": "5.1.4",
+    "@opam/dune": ">= 3.8.0",
+    "@opam/reason": "*"
+  },
+  "devDependencies": {
+    "@opam/merlin": "*",
+    "@opam/ocamlformat": "*",
+    "@opam/ocaml-lsp-server": "*"
+  },
+  "esy": {
+    "buildsInSource": "_build",
+    "build": [
+      "dune build -p aoc"
+    ]
+  },
+  "scripts": {
+    "build:watch": "dune build -w -p aoc"
+  },
+  "installConfig": {
+    "pnp": false
+  }
+}

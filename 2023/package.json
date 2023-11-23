@@ -1,0 +1,9 @@
+{
+  "scripts": {
+    "build": "esy",
+    "build:watch": "esy && esy build:watch"
+  },
+  "dependencies": {
+    "esy": "0.7.2"
+  }
+}
