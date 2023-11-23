@@ -1,7 +1,9 @@
 {
   "scripts": {
     "build": "esy",
-    "build:watch": "esy && esy build:watch"
+    "build:watch": "esy && esy build:watch",
+    "test": "esy x dune runtest",
+    "test:watch": "esy x dune runtest -w"
   },
   "dependencies": {
     "esy": "0.7.2"

@@ -1,2 +1,5 @@
 (library
- (name Day1))
+ (name Day1)
+ (inline_tests)
+ (preprocess
+  (pps ppx_inline_test)))

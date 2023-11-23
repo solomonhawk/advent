@@ -8,7 +8,8 @@
   "devDependencies": {
     "@opam/merlin": "*",
     "@opam/ocamlformat": "*",
-    "@opam/ocaml-lsp-server": "*"
+    "@opam/ocaml-lsp-server": "*",
+    "@opam/ppx_inline_test": "*"
   },
   "esy": {
     "buildsInSource": "_build",
