@@ -15,7 +15,7 @@ let read_file_seq = (path: string) => {
 };
 
 let read_file_str = (path: string) => {
-  let s = read_file_seq(path);
-
-  Seq.fold_left((acc, line) => acc ++ line ++ "\n", "", s);
+  path
+  |> read_file_seq
+  |> Seq.fold_left((acc, line) => acc ++ line ++ "\n", "");
 };
