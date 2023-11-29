@@ -34,20 +34,20 @@
       ],
       "installConfig": { "pnp": false }
     },
-    "@opam/yojson@opam:2.1.1@ad5e299c": {
-      "id": "@opam/yojson@opam:2.1.1@ad5e299c",
+    "@opam/yojson@opam:2.1.2@9fd14300": {
+      "id": "@opam/yojson@opam:2.1.2@9fd14300",
       "name": "@opam/yojson",
-      "version": "opam:2.1.1",
+      "version": "opam:2.1.2",
       "source": {
         "type": "install",
         "source": [
-          "archive:https://opam.ocaml.org/cache/sha256/d5/d58183207b198dc065866239066e074c34f9e139c0d9c4175a38809790e88173#sha256:d58183207b198dc065866239066e074c34f9e139c0d9c4175a38809790e88173",
-          "archive:https://github.com/ocaml-community/yojson/releases/download/2.1.1/yojson-2.1.1.tbz#sha256:d58183207b198dc065866239066e074c34f9e139c0d9c4175a38809790e88173"
+          "archive:https://opam.ocaml.org/cache/sha256/59/59f2f1abbfc8a7ccbdbf608894e5c75e8a76006e34899254446f83e200dfb4f9#sha256:59f2f1abbfc8a7ccbdbf608894e5c75e8a76006e34899254446f83e200dfb4f9",
+          "archive:https://github.com/ocaml-community/yojson/releases/download/2.1.2/yojson-2.1.2.tbz#sha256:59f2f1abbfc8a7ccbdbf608894e5c75e8a76006e34899254446f83e200dfb4f9"
         ],
         "opam": {
           "name": "yojson",
-          "version": "2.1.1",
-          "path": "esy.lock/opam/yojson.2.1.1"
+          "version": "2.1.2",
+          "path": "esy.lock/opam/yojson.2.1.2"
         }
       },
       "overrides": [],
@@ -519,11 +519,11 @@
       },
       "overrides": [],
       "dependencies": [
-        "ocaml@5.1.4@d41d8cd9", "@opam/yojson@opam:2.1.1@ad5e299c",
+        "ocaml@5.1.4@d41d8cd9", "@opam/yojson@opam:2.1.2@9fd14300",
         "@opam/dune@opam:3.11.1@ba2e0e6a", "@esy-ocaml/substs@0.0.1@d41d8cd9"
       ],
       "devDependencies": [
-        "ocaml@5.1.4@d41d8cd9", "@opam/yojson@opam:2.1.1@ad5e299c",
+        "ocaml@5.1.4@d41d8cd9", "@opam/yojson@opam:2.1.2@9fd14300",
         "@opam/dune@opam:3.11.1@ba2e0e6a"
       ]
     },
@@ -1242,7 +1242,7 @@
       },
       "overrides": [],
       "dependencies": [
-        "ocaml@5.1.4@d41d8cd9", "@opam/yojson@opam:2.1.1@ad5e299c",
+        "ocaml@5.1.4@d41d8cd9", "@opam/yojson@opam:2.1.2@9fd14300",
         "@opam/xdg@opam:3.11.1@1e207b0b", "@opam/uutf@opam:1.0.3@47c95a18",
         "@opam/stdune@opam:3.11.1@9a840882",
         "@opam/spawn@opam:v0.15.1@85e9d6f1", "@opam/re@opam:1.11.0@87deb463",
@@ -1261,7 +1261,7 @@
         "@esy-ocaml/substs@0.0.1@d41d8cd9"
       ],
       "devDependencies": [
-        "ocaml@5.1.4@d41d8cd9", "@opam/yojson@opam:2.1.1@ad5e299c",
+        "ocaml@5.1.4@d41d8cd9", "@opam/yojson@opam:2.1.2@9fd14300",
         "@opam/xdg@opam:3.11.1@1e207b0b", "@opam/uutf@opam:1.0.3@47c95a18",
         "@opam/stdune@opam:3.11.1@9a840882",
         "@opam/spawn@opam:v0.15.1@85e9d6f1", "@opam/re@opam:1.11.0@87deb463",
@@ -1373,14 +1373,14 @@
       },
       "overrides": [],
       "dependencies": [
-        "ocaml@5.1.4@d41d8cd9", "@opam/yojson@opam:2.1.1@ad5e299c",
+        "ocaml@5.1.4@d41d8cd9", "@opam/yojson@opam:2.1.2@9fd14300",
         "@opam/merlin-lib@opam:4.12-501@63956d65",
         "@opam/dune@opam:3.11.1@ba2e0e6a",
         "@opam/dot-merlin-reader@opam:4.9@5d77f68f",
         "@esy-ocaml/substs@0.0.1@d41d8cd9"
       ],
       "devDependencies": [
-        "ocaml@5.1.4@d41d8cd9", "@opam/yojson@opam:2.1.1@ad5e299c",
+        "ocaml@5.1.4@d41d8cd9", "@opam/yojson@opam:2.1.2@9fd14300",
         "@opam/merlin-lib@opam:4.12-501@63956d65",
         "@opam/dune@opam:3.11.1@ba2e0e6a",
         "@opam/dot-merlin-reader@opam:4.9@5d77f68f"
