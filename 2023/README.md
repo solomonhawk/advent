@@ -22,14 +22,15 @@ This is an alias for `esy install` or `esy i`.
 
     $ npm run build:watch
 
-    # with alias n="npm run"
-    $ n build:watch
+## Test
 
-## TODO
+    $ npm run test
+    $ npm run test:watch
 
-- [x] Run dune build in watch mode
-- [x] Set up unit testing
-  - [x] `dune runtest`
+**Note**: Only one dune process can be run at a time (it locks the build directory), so you must stop the watch process before running tests.
+
+## Notes/Questions
+
 - [ ] Can `esy` be used with `asdf-ocaml` in a sensible way?
   - [ ] `esy` has it's own project sandboxing (like `opam` switches, but project-specific by default)
 
@@ -37,3 +38,12 @@ This is an alias for `esy install` or `esy i`.
 
 - https://www.chrisarmstrong.dev/posts/setting-up-a-new-reason-project
 - https://mukulrathi.com/ocaml-tooling-dune/
+- https://reasonml.github.io/en/try.html
+- https://github.com/fangyi-zhou/advent-of-code-ocaml-starter/tree/main
+- https://github.com/fangyi-zhou/advent-of-code/tree/main/2022
+- https://github.com/DrearyLisper/aoc-2022
+- https://ocaml.org/docs
+- https://reasonml.github.io/docs/en/overview
+- https://dune.readthedocs.io/en/stable/index.html
+- https://esy.sh/docs/getting-started/
+- https://github.com/janestreet/ppx_inline_test/tree/master
