@@ -47,3 +47,6 @@ This is an alias for `esy install` or `esy i`.
 - https://dune.readthedocs.io/en/stable/index.html
 - https://esy.sh/docs/getting-started/
 - https://github.com/janestreet/ppx_inline_test/tree/master
+- https://discuss.ocaml.org/t/how-to-set-up-unit-testing-in-2023/12682/26
+- https://discuss.ocaml.org/t/ocaml-stdlib-and-death-by-a-thousand-papercuts/9180/9
+- https://c-cube.github.io/ocaml-containers/last/containers/index.html

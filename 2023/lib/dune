@@ -1,5 +1,7 @@
 (library
  (name aoc)
- (inline_tests)
+ (inline_tests
+  (flags (-verbose)))
+ (libraries sexplib containers)
  (preprocess
-  (pps ppx_inline_test)))
+  (pps ppx_inline_test ppx_expect ppx_assert)))

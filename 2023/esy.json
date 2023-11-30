@@ -1,15 +1,20 @@
 {
   "name": "aoc-2023",
   "dependencies": {
-    "ocaml": "5.1.4",
+    "@opam/containers": "3.12",
     "@opam/dune": ">= 3.8.0",
-    "@opam/reason": "*"
+    "@opam/reason": "*",
+    "ocaml": "5.1.4"
   },
   "devDependencies": {
     "@opam/merlin": "*",
-    "@opam/ocamlformat": "*",
     "@opam/ocaml-lsp-server": "*",
-    "@opam/ppx_inline_test": "*"
+    "@opam/ocamlformat": "*",
+    "@opam/ppx_assert": "*",
+    "@opam/ppx_expect": "v0.16.0",
+    "@opam/ppx_inline_test": "*",
+    "@opam/sexplib": "v0.16.0",
+    "@opam/utop": "*"
   },
   "esy": {
     "buildsInSource": "_build",
