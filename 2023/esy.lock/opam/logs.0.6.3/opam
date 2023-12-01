@@ -17,12 +17,10 @@ depopts: [
   "js_of_ocaml"
   "fmt"
   "cmdliner"
-  "lwt"
-  "base-threads"
-]
+  "lwt" ]
 conflicts: [
-   "cmdliner" {< "0.9.8"}
-   "js_of_ocaml" { < "3.3.0" }
+  "js_of_ocaml" { < "3.3.0" } 
+  "cmdliner" { < "0.9.8" }
 ]
 
 build: [[
@@ -31,9 +29,7 @@ build: [[
           "--with-js_of_ocaml" "%{js_of_ocaml:installed}%"
           "--with-fmt" "%{fmt:installed}%"
           "--with-cmdliner" "%{cmdliner:installed}%"
-          "--with-lwt" "%{lwt:installed}%"
-          "--with-base-threads" "%{base-threads:installed}%"
-]]
+          "--with-lwt" "%{lwt:installed}%" ]]
 
 synopsis: """Logging infrastructure for OCaml"""
 description: """\
@@ -61,6 +57,6 @@ Logs and its reporters are distributed under the ISC license.
 [lwt]: http://ocsigen.org/lwt/
 """
 url {
-archive: "https://erratique.ch/software/logs/releases/logs-0.7.0.tbz"
-checksum: "2bf021ca13331775e33cf34ab60246f7"
+archive: "https://erratique.ch/software/logs/releases/logs-0.6.3.tbz"
+checksum: "370e4c802588f73d0777c59bc414b57b"
 }
