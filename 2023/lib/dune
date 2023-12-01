@@ -4,4 +4,4 @@
   (flags (-verbose)))
  (libraries sexplib containers)
  (preprocess
-  (pps ppx_inline_test ppx_expect ppx_assert)))
+  (pps ppx_inline_test ppx_expect ppx_assert ppx_compare ppx_sexp_conv)))
