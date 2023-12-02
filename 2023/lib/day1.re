@@ -1,4 +1,6 @@
 // https://adventofcode.com/2023/day/1
+include Import;
+
 open Containers;
 
 // without these 2 lines, I get:
@@ -9,30 +11,13 @@ open Sexplib.Std;
 
 module M = {
   [@deriving (compare, sexp, show)]
-  type v =
-    | N(int)
-    | L(char);
-
-  [@deriving (compare, sexp, show)]
-  type t = list(list(v));
+  type t = list(list(char));
 
   let title = "Day 1: Trebuchet?!";
   let input_filename = "day1.txt";
 
   let parse = (input: string): t => {
-    input
-    |> String.trim
-    |> String.split_on_char('\n')
-    |> List.map(line =>
-         line
-         |> String.to_list
-         |> List.map(char =>
-              switch (char) {
-              | '0' .. '9' => N(Char.to_int(char) - Char.to_int('0'))
-              | _ => L(char)
-              }
-            )
-       );
+    input |> String.trim |> String.lines |> List.map(String.to_list);
   };
 
   /**
@@ -40,65 +25,47 @@ module M = {
    * number words that might be the start of another number word included (e.g.
    * "eighthree" needs to be parsed into 8, 3).
    */
-  let rec parse_number_words = (l: list(v)): list(v) => {
+  let rec parse_ns = (l: list(char)): list(int) => {
     switch (l) {
-    | [N(n), ...tl] => [N(n), ...parse_number_words(tl)]
-    | [L('o'), L('n'), L('e'), ...tl] => [
-        N(1),
-        ...parse_number_words([L('e'), ...tl]),
+    | [n, ...tl] when Utils.is_digit(n) => [
+        Char.code(n) - Char.code('0'),
+        ...parse_ns(tl),
       ]
-    | [L('t'), L('w'), L('o'), ...tl] => [
-        N(2),
-        ...parse_number_words([L('o'), ...tl]),
-      ]
-    | [L('t'), L('h'), L('r'), L('e'), L('e'), ...tl] => [
-        N(3),
-        ...parse_number_words([L('e'), ...tl]),
-      ]
-    | [L('f'), L('o'), L('u'), L('r'), ...tl] => [
-        N(4),
-        ...parse_number_words(tl),
-      ]
-    | [L('f'), L('i'), L('v'), L('e'), ...tl] => [
-        N(5),
-        ...parse_number_words([L('e'), ...tl]),
-      ]
-    | [L('s'), L('i'), L('x'), ...tl] => [N(6), ...parse_number_words(tl)]
-    | [L('s'), L('e'), L('v'), L('e'), L('n'), ...tl] => [
-        N(7),
-        ...parse_number_words([L('n'), ...tl]),
-      ]
-    | [L('e'), L('i'), L('g'), L('h'), L('t'), ...tl] => [
-        N(8),
-        ...parse_number_words([L('t'), ...tl]),
-      ]
-    | [L('n'), L('i'), L('n'), L('e'), ...tl] => [
-        N(9),
-        ...parse_number_words([L('e'), ...tl]),
-      ]
-    | [L(_), ...tl] => parse_number_words(tl)
+    | ['o', 'n', 'e', ...tl] => [1, ...parse_ns(['e', ...tl])]
+    | ['t', 'w', 'o', ...tl] => [2, ...parse_ns(['o', ...tl])]
+    | ['t', 'h', 'r', 'e', 'e', ...tl] => [3, ...parse_ns(['e', ...tl])]
+    | ['f', 'o', 'u', 'r', ...tl] => [4, ...parse_ns(tl)]
+    | ['f', 'i', 'v', 'e', ...tl] => [5, ...parse_ns(['e', ...tl])]
+    | ['s', 'i', 'x', ...tl] => [6, ...parse_ns(tl)]
+    | ['s', 'e', 'v', 'e', 'n', ...tl] => [7, ...parse_ns(['n', ...tl])]
+    | ['e', 'i', 'g', 'h', 't', ...tl] => [8, ...parse_ns(['t', ...tl])]
+    | ['n', 'i', 'n', 'e', ...tl] => [9, ...parse_ns(['e', ...tl])]
+    | [_, ...tl] => parse_ns(tl)
     | [] => []
     };
   };
 
-  let nums_as_str = (vv: v): option(string) => {
-    switch (vv) {
-    | L(_) => None
-    | N(n) => Some(string_of_int(n))
+  let digits = (c: char): option(char) => {
+    switch (c) {
+    | n when Utils.is_digit(n) => Some(n)
+    | _ => None
     };
   };
 
-  let int_from_bookends = (nums: list(string)): int => {
+  let int_from_bookends = (nums: list(int)): int => {
     let first = List.hd(nums);
     let last = List.rev(nums) |> List.hd;
 
-    int_of_string(first ++ last);
+    int_of_string(string_of_int(first) ++ string_of_int(last));
   };
 
   let part1 = (parsed_input: t) => {
     parsed_input
-    |> List.map(line => {
-         line |> List.filter_map(nums_as_str) |> int_from_bookends
+    |> List.map(chars => {
+         chars
+         |> List.filter_map(digits)
+         |> List.map(c => Char.code(c) - Char.code('0'))
+         |> int_from_bookends
        })
     |> List.fold_left((+), 0)
     |> string_of_int
@@ -106,7 +73,13 @@ module M = {
   };
 
   let part2 = (parsed_input: t) => {
-    parsed_input |> List.map(parse_number_words) |> part1;
+    parsed_input
+    |> List.map(parse_ns >> int_from_bookends)
+    |> List.fold_left((+), 0)
+    |> string_of_int
+    |> print_endline;
+
+    ();
   };
 };
 
@@ -129,87 +102,43 @@ zoneight234
 let%test_unit "parse" =
   [%test_eq: t](
     parse("1abc2\ni4b1d"),
-    [
-      [N(1), L('a'), L('b'), L('c'), N(2)],
-      [L('i'), N(4), L('b'), N(1), L('d')],
-    ],
+    [['1', 'a', 'b', 'c', '2'], ['i', '4', 'b', '1', 'd']],
   );
 
-let%test_unit "parse_number_words 1" =
-  [%test_eq: list(v)](
-    parse_number_words([
-      L('x'),
-      N(7),
-      L('o'),
-      L('n'),
-      L('e'),
-      N(5),
-      L('b'),
-    ]),
-    [N(7), N(1), N(5)],
+let%test_unit "parse_ns 1" =
+  [%test_eq: list(int)](
+    parse_ns(['x', '7', 'o', 'n', 'e', '5', 'b']),
+    [7, 1, 5],
   );
 
-let%test_unit "parse_number_words 2" =
-  [%test_eq: list(v)](
-    parse_number_words([L('t'), L('w'), L('o')]),
-    [N(2)],
-  );
+let%test_unit "parse_ns 2" =
+  [%test_eq: list(int)](parse_ns(['t', 'w', 'o']), [2]);
 
-let%test_unit "parse_number_words 3" =
-  [%test_eq: list(v)](
-    parse_number_words([L('t'), L('h'), L('r'), L('e'), L('e')]),
-    [N(3)],
-  );
+let%test_unit "parse_ns 3" =
+  [%test_eq: list(int)](parse_ns(['t', 'h', 'r', 'e', 'e']), [3]);
 
-let%test_unit "parse_number_words 4" =
-  [%test_eq: list(v)](
-    parse_number_words([L('f'), L('o'), L('u'), L('r')]),
-    [N(4)],
-  );
+let%test_unit "parse_ns 4" =
+  [%test_eq: list(int)](parse_ns(['f', 'o', 'u', 'r']), [4]);
 
-let%test_unit "parse_number_words 5" =
-  [%test_eq: list(v)](
-    parse_number_words([L('f'), L('i'), L('v'), L('e')]),
-    [N(5)],
-  );
+let%test_unit "parse_ns 5" =
+  [%test_eq: list(int)](parse_ns(['f', 'i', 'v', 'e']), [5]);
 
-let%test_unit "parse_number_words 6" =
-  [%test_eq: list(v)](
-    parse_number_words([L('s'), L('i'), L('x')]),
-    [N(6)],
-  );
+let%test_unit "parse_ns 6" =
+  [%test_eq: list(int)](parse_ns(['s', 'i', 'x']), [6]);
 
-let%test_unit "parse_number_words 7" =
-  [%test_eq: list(v)](
-    parse_number_words([L('s'), L('e'), L('v'), L('e'), L('n')]),
-    [N(7)],
-  );
+let%test_unit "parse_ns 7" =
+  [%test_eq: list(int)](parse_ns(['s', 'e', 'v', 'e', 'n']), [7]);
 
-let%test_unit "parse_number_words 8" =
-  [%test_eq: list(v)](
-    parse_number_words([L('e'), L('i'), L('g'), L('h'), L('t')]),
-    [N(8)],
-  );
+let%test_unit "parse_ns 8" =
+  [%test_eq: list(int)](parse_ns(['e', 'i', 'g', 'h', 't']), [8]);
 
-let%test_unit "parse_number_words 9" =
-  [%test_eq: list(v)](
-    parse_number_words([L('n'), L('i'), L('n'), L('e')]),
-    [N(9)],
-  );
+let%test_unit "parse_ns 9" =
+  [%test_eq: list(int)](parse_ns(['n', 'i', 'n', 'e']), [9]);
 
-let%test_unit "parse_number_words overlap" =
-  [%test_eq: list(v)](
-    parse_number_words([
-      L('n'),
-      L('i'),
-      L('n'),
-      L('e'),
-      L('i'),
-      L('g'),
-      L('h'),
-      L('t'),
-    ]),
-    [N(9), N(8)],
+let%test_unit "parse_ns overlap" =
+  [%test_eq: list(int)](
+    parse_ns(['n', 'i', 'n', 'e', 'i', 'g', 'h', 't']),
+    [9, 8],
   );
 
 let%expect_test "part1" = {
