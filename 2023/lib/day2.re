@@ -117,8 +117,6 @@ module M = {
     |> Utils.sum_int_list
     |> string_of_int
     |> print_endline;
-
-    ();
   };
 };
 
