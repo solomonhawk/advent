@@ -13,9 +13,6 @@ module Schematic = {
     | Num(int, int, int)
     | Sym(char, int, int);
 
-  // [@deriving (compare, sexp, show)]
-  // type element = (component, int, int); // c, x, y
-
   [@deriving (compare, sexp, show)]
   type t = list(component);
 
@@ -32,14 +29,13 @@ module Schematic = {
   let parse_line = (y: int, line: string): t => {
     let (els, _, _) =
       line
-      // appending "." makes sure parsing handles numbers that appear at the end of the line
+      // appending "." makes sure we parse numbers that appear at the end of the line
       ++ "."
       |> String.to_list
       |> List.fold_left(
            ((els, x, n), c) => {
              switch (c) {
              // when we find a digit, append it to the current number
-             // TODO: handle case where number is last in row
              | '0' .. '9' => (els, x + 1, n ++ Char.escaped(c))
 
              // when we find a '.'
@@ -96,27 +92,13 @@ module Schematic = {
     input |> String.lines |> List.flat_map_i(parse_line);
   };
 
-  let is_num = (c: component): bool => {
-    switch (c) {
-    | Num(_) => true
-    | _ => false
-    };
-  };
-
-  let is_sym = (c: component): bool => {
-    switch (c) {
-    | Sym(_) => true
-    | _ => false
-    };
-  };
-
-  let component_bounds = (n: int, x: int, y: int): (int, int, int, int) => {
-    let len = String.length(string_of_int(n));
-    (x - 1, x + len, y - 1, y + 1);
+  let component_bounds = (w: int, x: int, y: int): (int, int, int, int) => {
+    (x - 1, x + w, y - 1, y + 1);
   };
 
   let is_symbol_adjacent = (components: t, n: int, x: int, y: int): bool => {
-    let (l, r, t, b) = component_bounds(n, x, y);
+    let (l, r, t, b) =
+      component_bounds(String.length(string_of_int(n)), x, y);
 
     components
     |> List.filter(c => {
@@ -128,9 +110,47 @@ module Schematic = {
     |> List.length > 0;
   };
 
+  let is_number_adjacent = (x: int, y: int, c: component): bool => {
+    let (l, r, t, b) = component_bounds(1, x, y);
+
+    switch (c) {
+    | Num(n, nx, ny) =>
+      let w = String.length(string_of_int(n));
+      nx + w - 1 >= l && nx <= r && ny >= t && ny <= b;
+    | _ => false
+    };
+  };
+
+  let adjacent_numbers = (components: t, x: int, y: int): t => {
+    components |> List.filter(is_number_adjacent(x, y));
+  };
+
   let is_part_number = (components: t, c: component): option(int) => {
     switch (c) {
     | Num(n, x, y) when is_symbol_adjacent(components, n, x, y) => Some(n)
+    | _ => None
+    };
+  };
+
+  let is_gear = (components: t, c: component): option(int) => {
+    switch (c) {
+    | Sym('*', x, y) =>
+      let nums = adjacent_numbers(components, x, y);
+
+      if (List.length(nums) == 2) {
+        let product =
+          nums
+          |> List.filter_map(c => {
+               switch (c) {
+               | Num(n, _, _) => Some(n)
+               | _ => None
+               }
+             })
+          |> List.fold_left(( * ), 1);
+        Some(product);
+      } else {
+        None;
+      };
     | _ => None
     };
   };
@@ -148,15 +168,18 @@ module M = {
 
   let part1 = (components: t) => {
     components
-    |> List.filter(Schematic.is_num)
     |> List.filter_map(Schematic.is_part_number(components))
     |> Utils.sum_int_list
     |> string_of_int
     |> print_endline;
   };
 
-  let part2 = (_parsed_input: t) => {
-    ();
+  let part2 = (components: t) => {
+    components
+    |> List.filter_map(Schematic.is_gear(components))
+    |> Utils.sum_int_list
+    |> string_of_int
+    |> print_endline;
   };
 };
 
@@ -186,7 +209,7 @@ let%test_unit "parse number at end of line" =
     [Num(617, 0, 0), Sym('*', 3, 0), Num(289, 7, 1), Sym('*', 3, 1)],
   );
 
-let%test_unit "parse number at end of line" =
+let%test_unit "is_raw_symbol" =
   [%test_eq: bool](
     List.for_all(
       Schematic.is_raw_symbol,
@@ -212,12 +235,98 @@ let%test_unit "parse number at end of line" =
     true,
   );
 
+let%test_unit "component_bounds" =
+  [%test_eq: list((int, int, int, int))](
+    [
+      // width of 1
+      Schematic.component_bounds(1, 2, 3),
+      // width > 1
+      Schematic.component_bounds(3, 2, 3),
+    ],
+    [(1, 3, 2, 4), (1, 5, 2, 4)],
+  );
+
+let%test_unit "is_part_number" =
+  [%test_eq: list(option(int))](
+    [
+      // symbol left
+      Schematic.is_part_number(
+        [Schematic.Sym('%', 0, 1)],
+        Schematic.Num(111, 1, 1),
+      ),
+      // symbol above
+      Schematic.is_part_number(
+        [Schematic.Sym('%', 1, 0)],
+        Schematic.Num(222, 1, 1),
+      ),
+      // symbol right
+      Schematic.is_part_number(
+        [Schematic.Sym('%', 4, 1)],
+        Schematic.Num(333, 1, 1),
+      ),
+      // symbol below
+      Schematic.is_part_number(
+        [Schematic.Sym('%', 1, 2)],
+        Schematic.Num(444, 1, 1),
+      ),
+      // symbol diagonal
+      Schematic.is_part_number(
+        [Schematic.Sym('%', 0, 0)],
+        Schematic.Num(555, 1, 1),
+      ),
+      // not adjacent
+      Schematic.is_part_number(
+        [Schematic.Sym('%', 6, 1)],
+        Schematic.Num(111, 1, 1),
+      ),
+      // nothing to compare to
+      Schematic.is_part_number([], Schematic.Num(222, 1, 1)),
+    ],
+    [Some(111), Some(222), Some(333), Some(444), Some(555), None, None],
+  );
+
+let%test_unit "is_gear" =
+  [%test_eq: list(option(int))](
+    [
+      // numbers above and below
+      Schematic.is_gear(
+        [Schematic.Num(2, 1, 0), Schematic.Num(4, 1, 2)],
+        Schematic.Sym('*', 1, 1),
+      ),
+      // numbers diagonal
+      Schematic.is_gear(
+        [Schematic.Num(10, 1, 0), Schematic.Num(20, 4, 2)],
+        Schematic.Sym('*', 3, 1),
+      ),
+      // not enough numbers
+      Schematic.is_gear(
+        [Schematic.Num(10, 1, 0)],
+        Schematic.Sym('*', 3, 1),
+      ),
+      // too many adjacent numbers
+      Schematic.is_gear(
+        [
+          Schematic.Num(10, 1, 0),
+          Schematic.Num(20, 4, 2),
+          Schematic.Num(420, 0, 1),
+        ],
+        Schematic.Sym('*', 3, 1),
+      ),
+      // not a '*' symbol
+      Schematic.is_gear(
+        [Schematic.Num(10, 1, 0), Schematic.Num(20, 4, 2)],
+        Schematic.Sym('%', 3, 1),
+      ),
+    ],
+    [Some(8), Some(200), None, None, None],
+  );
+
 let%expect_test "part1" = {
   part1(parse(example));
   [%expect {| 4361 |}];
 };
 
-// let%expect_test [@tags "disabled"] "part2" = {
-//   part2();
-//   [%expect {| |}];
-// };
+let%expect_test "part2" = {
+  part2(parse(example));
+  [%expect {| 467835 |}];
+};
