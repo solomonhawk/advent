@@ -16,7 +16,7 @@ module Schematic = {
   [@deriving (compare, sexp, show)]
   type t = list(component);
 
-  let is_raw_symbol = (c: char): bool => {
+  let is_sym = (c: char): bool => {
     switch (c) {
     | '.' => false
     | '='
@@ -70,7 +70,7 @@ module Schematic = {
              switch (c) {
              | '0' .. '9' => append_digit_to_n(els, c, x, n)
              | '.' => append_last_n_if_defined(els, x, y, n)
-             | c when is_raw_symbol(c) =>
+             | c when is_sym(c) =>
                append_sym_and_last_n_if_defined(els, c, x, y, n)
              | _ => (els, x, n)
              }
@@ -205,7 +205,7 @@ let%test_unit "parse number at end of line" =
 let%test_unit "is_raw_symbol" =
   [%test_eq: bool](
     List.for_all(
-      Schematic.is_raw_symbol,
+      Schematic.is_sym,
       [
         '@',
         '!',

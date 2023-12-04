@@ -33,6 +33,10 @@ let sum_int_list = (list: list(int)): int => {
   List.fold_left((+), 0, list);
 };
 
+let print_int_list = (l: list(int)) => {
+  l |> List.map(string_of_int) |> String.concat(",") |> print_endline;
+};
+
 let is_digit = (c: char): bool => {
   switch (c) {
   | '0' .. '9' => true
