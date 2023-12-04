@@ -26,8 +26,41 @@ module Schematic = {
     };
   };
 
-  let parse_line = (y: int, line: string): t => {
-    let (els, _, _) =
+  module LineParser = {
+    type t = (list(component), int, string);
+
+    let int = int_of_string;
+
+    let new_state = ([], 0, "");
+
+    let append_digit_to_n =
+        (els: list(component), c: char, x: int, n: string): t => {
+      (els, x + 1, n ++ Char.escaped(c));
+    };
+
+    let append_last_n_if_defined =
+        (els: list(component), x: int, y: int, n: string) =>
+      if (String.is_empty(n)) {
+        (els, x + 1, n);
+      } else {
+        ([Num(int(n), x - String.length(n), y), ...els], x + 1, "");
+      };
+
+    let append_sym_and_last_n_if_defined =
+        (els: list(component), c: char, x: int, y: int, n: string) =>
+      if (String.is_empty(n)) {
+        ([Sym(c, x, y), ...els], x + 1, n);
+      } else {
+        (
+          [Num(int(n), x - String.length(n), y), Sym(c, x, y), ...els],
+          x + 1,
+          "",
+        );
+      };
+
+    let elements = ((els: 'a, _, _)): 'a => els;
+
+    let parse_line = (y: int, line: string): list(component) => {
       line
       // appending "." makes sure we parse numbers that appear at the end of the line
       ++ "."
@@ -35,61 +68,21 @@ module Schematic = {
       |> List.fold_left(
            ((els, x, n), c) => {
              switch (c) {
-             // when we find a digit, append it to the current number
-             | '0' .. '9' => (els, x + 1, n ++ Char.escaped(c))
-
-             // when we find a '.'
-             | '.' =>
-               if (String.is_empty(n)) {
-                 (
-                   // if empty previous number, continue
-                   els,
-                   x + 1,
-                   n,
-                 );
-               } else {
-                 (
-                   // if non-empty previous number, add it to els
-                   [
-                     Num(int_of_string(n), x - String.length(n), y),
-                     ...els,
-                   ],
-                   x + 1,
-                   "",
-                 );
-               }
-             // when we find a symbol
+             | '0' .. '9' => append_digit_to_n(els, c, x, n)
+             | '.' => append_last_n_if_defined(els, x, y, n)
              | c when is_raw_symbol(c) =>
-               if (String.is_empty(n)) {
-                 (
-                   // if empty previous number, add symbol element
-                   [Sym(c, x, y), ...els],
-                   x + 1,
-                   n,
-                 );
-               } else {
-                 (
-                   // if non-empty previous number, add it then add the symbol
-                   [
-                     Num(int_of_string(n), x - String.length(n), y),
-                     Sym(c, x, y),
-                     ...els,
-                   ],
-                   x + 1,
-                   "",
-                 );
-               }
+               append_sym_and_last_n_if_defined(els, c, x, y, n)
              | _ => (els, x, n)
              }
            },
-           ([], 0, ""),
-         );
-
-    els;
+           new_state,
+         )
+      |> elements;
+    };
   };
 
   let from_str = (input: string): t => {
-    input |> String.lines |> List.flat_map_i(parse_line);
+    input |> String.lines |> List.flat_map_i(LineParser.parse_line);
   };
 
   let component_bounds = (w: int, x: int, y: int): (int, int, int, int) => {
